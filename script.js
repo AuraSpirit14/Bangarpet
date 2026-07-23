@@ -65,6 +65,20 @@ async function nextOrderNumber() {
   return "PC-" + demoOrderCounter;
 }
 
+// Builds an absolute link to the order-status page for a given order id,
+// based on wherever this site is currently hosted (works on GitHub Pages,
+// a custom domain, or a subfolder) so it's safe to drop into a WhatsApp
+// message or show on the page.
+function buildStatusLink(orderId) {
+  let path = window.location.pathname;
+  if (path.endsWith("index.html")) {
+    path = path.slice(0, -"index.html".length);
+  } else if (!path.endsWith("/")) {
+    path = path.substring(0, path.lastIndexOf("/") + 1);
+  }
+  return window.location.origin + path + "status.html?order=" + encodeURIComponent(orderId);
+}
+
 // ================= LOAD MENU (Firestore, falls back to local list) =================
 async function loadMenu() {
   document.getElementById("menu-grid").innerHTML = `<p class="menu-loading">Loading menu...</p>`;
@@ -375,10 +389,12 @@ document.getElementById("cod-order-btn").addEventListener("click", async () => {
 
   try {
     await saveOrderToFirestore(record);
+    const statusLink = buildStatusLink(record.orderId);
     document.getElementById("form-error").style.color = "#2F3B28";
-    document.getElementById("form-error").textContent =
-      `Order #${record.orderId} placed! Pay ${record.paymentMethod.toLowerCase()} — we'll start preparing it shortly.`;
-    setTimeout(() => resetCartAndForm(), 1800);
+    document.getElementById("form-error").innerHTML =
+      `Order #${record.orderId} placed! Pay ${record.paymentMethod.toLowerCase()} — we'll start preparing it shortly.<br>` +
+      `<a href="${statusLink}" target="_blank" style="color:#B33F2E;font-weight:600;text-decoration:underline;">Track your order status →</a>`;
+    setTimeout(() => resetCartAndForm(), 6000);
   } catch (err) {
     console.error("Couldn't save order:", err);
     document.getElementById("form-error").style.color = "";
@@ -409,7 +425,13 @@ document.getElementById("whatsapp-order-btn").addEventListener("click", async ()
   }
 
   sendWhatsAppOrder(id, now, data, items, subtotal, delivery, total);
-  resetCartAndForm();
+
+  const statusLink = buildStatusLink(id);
+  document.getElementById("form-error").style.color = "#2F3B28";
+  document.getElementById("form-error").innerHTML =
+    `Order #${id} sent on WhatsApp!<br>` +
+    `<a href="${statusLink}" target="_blank" style="color:#B33F2E;font-weight:600;text-decoration:underline;">Track your order status →</a>`;
+  setTimeout(() => resetCartAndForm(), 6000);
 
   btn.disabled = false;
   btn.textContent = "Order on WhatsApp";
@@ -442,6 +464,8 @@ function sendWhatsAppOrder(id, now, data, items, subtotal, delivery, total) {
     `*Customer:* ${data.name}`,
     `*Phone:* ${data.phone}`,
     data.notes ? `*Notes:* ${data.notes}` : null,
+    "",
+    `📍 Track order: ${buildStatusLink(id)}`,
   ].filter(Boolean);
 
   const message = encodeURIComponent(messageLines.join("\n"));
