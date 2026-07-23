@@ -17,7 +17,7 @@ body{
   margin:0;
   /* Falls back to --cream if no image is found or the path below is wrong */
   background-color:var(--cream);
-  background-image:url("./Photos/bg.png");
+  background-image:url("./photos/bg.png");
   background-size:cover;
   background-position:top center;
   background-attachment:fixed;
@@ -147,6 +147,7 @@ a{color:inherit;}
   background:rgba(255,249,238,0.5);border-radius:10px;
 }
 
+.menu-loading{grid-column:1/-1;text-align:center;color:var(--muted);font-size:14px;padding:30px;}
 .menu-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;}
 .menu-card{
   background:#fff9ee;border:1px solid var(--line);border-radius:14px;
