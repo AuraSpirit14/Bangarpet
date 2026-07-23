@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Track Your Order — The Chaya & Co.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Jost', sans-serif;
+    background: #FBF6EE;
+    color: #2F3B28;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 16px 60px;
+  }
+  .status-brand {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 22px;
+    margin-bottom: 28px;
+    text-decoration: none;
+    color: #2F3B28;
+  }
+  .status-card {
+    background: #fff;
+    border-radius: 18px;
+    padding: 28px 24px;
+    max-width: 460px;
+    width: 100%;
+    box-shadow: 0 6px 24px rgba(47,59,40,0.08);
+  }
+  .lookup-card { text-align: center; }
+  .lookup-card input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid #ddd4c0;
+    font-family: 'Jost', sans-serif;
+    font-size: 15px;
+    margin: 14px 0;
+  }
+  .lookup-card button, .retry-btn {
+    background: #B33F2E;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 20px;
+    font-family: 'Jost', sans-serif;
+    font-weight: 500;
+    font-size: 15px;
+    cursor: pointer;
+    width: 100%;
+  }
+  .eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #9a8f6f;
+    margin: 0 0 4px;
+  }
+  .order-id-line {
+    font-family: 'Fraunces', serif;
+    font-size: 26px;
+    font-weight: 600;
+    margin: 0 0 22px;
+  }
+  .steps { list-style: none; margin: 0 0 24px; padding: 0; }
+  .steps li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    font-size: 15px;
+    color: #b7ae95;
+  }
+  .steps li .dot {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: #e8e1cc;
+    flex-shrink: 0;
+  }
+  .steps li.done { color: #2F3B28; }
+  .steps li.done .dot { background: #6f8c5a; }
+  .steps li.current { color: #B33F2E; font-weight: 600; }
+  .steps li.current .dot {
+    background: #B33F2E;
+    box-shadow: 0 0 0 4px rgba(179,63,46,0.15);
+  }
+  .status-note {
+    background: #FBF6EE;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 14px;
+    margin-bottom: 18px;
+  }
+  .order-details { font-size: 14px; line-height: 1.7; color: #5c5847; }
+  .order-details strong { color: #2F3B28; }
+  .not-found { text-align: center; color: #5c5847; font-size: 14px; }
+  .error-text { color: #B33F2E; font-size: 13px; margin-top: 8px; min-height: 16px; }
+  .updated-line { text-align: center; font-size: 12px; color: #b7ae95; margin-top: 18px; }
+</style>
+</head>
+<body>
+
+<a href="index.html" class="status-brand">The Chaya &amp; Co.</a>
+
+<!-- Lookup form, shown if no order id in the URL or order not found -->
+<div class="status-card lookup-card hidden" id="lookup-card">
+  <p class="eyebrow">Track Your Order</p>
+  <p>Enter your order number (e.g. <strong>PC-1023</strong>) to see live status.</p>
+  <input type="text" id="lookup-input" placeholder="PC-1023">
+  <button id="lookup-btn">Track Order</button>
+  <p class="error-text" id="lookup-error"></p>
+</div>
+
+<!-- Live status card -->
+<div class="status-card hidden" id="status-card">
+  <p class="eyebrow">Order Status</p>
+  <p class="order-id-line" id="order-id-display"></p>
+
+  <ul class="steps" id="steps-list"></ul>
+
+  <div class="status-note" id="status-note"></div>
+
+  <div class="order-details" id="order-details"></div>
+
+  <p class="updated-line">This page updates automatically — no need to refresh.</p>
+</div>
+
+<!-- Firebase (compat SDK) -->
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="status.js?v=1"></script>
+</body>
+</html>
