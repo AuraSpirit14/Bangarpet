@@ -139,7 +139,6 @@ function renderOrderCard(order) {
 // ================= MENU ADMIN =================
 let menuItemsCache = [];
 let editingItemId = null;
-let editingPhotoFile = null;
 
 async function loadMenuAdmin() {
   try {
@@ -178,7 +177,6 @@ document.getElementById("add-item-btn").addEventListener("click", () => openItem
 
 function openItemModal(item) {
   editingItemId = item ? item.id : null;
-  editingPhotoFile = null;
   document.getElementById("item-modal-title").textContent = item ? "Edit Item" : "Add Menu Item";
   document.getElementById("item-name").value = item ? item.name : "";
   document.getElementById("item-desc").value = item ? item.desc : "";
@@ -187,7 +185,6 @@ function openItemModal(item) {
   document.getElementById("item-tags").value = item && item.tags ? item.tags.join(", ") : "";
   document.getElementById("item-instock").checked = item ? item.inStock !== false : true;
   document.getElementById("item-modal-error").textContent = "";
-  document.getElementById("item-photo").value = "";
   document.getElementById("item-photo-url").value = item && item.photoUrl ? item.photoUrl : "";
   const preview = document.getElementById("item-photo-preview");
   if (item && item.photoUrl) {
@@ -204,25 +201,13 @@ document.getElementById("close-item-modal").addEventListener("click", () => {
   document.getElementById("item-modal-overlay").classList.remove("visible");
 });
 
-document.getElementById("item-photo").addEventListener("change", (e) => {
-  editingPhotoFile = e.target.files[0] || null;
-  if (editingPhotoFile) {
-    document.getElementById("item-photo-url").value = ""; // uploading a file overrides any pasted URL
-    const preview = document.getElementById("item-photo-preview");
-    preview.src = URL.createObjectURL(editingPhotoFile);
-    preview.classList.remove("hidden");
-  }
-});
-
 document.getElementById("item-photo-url").addEventListener("input", (e) => {
   const url = e.target.value.trim();
   const preview = document.getElementById("item-photo-preview");
   if (url) {
-    editingPhotoFile = null; // pasting a URL overrides any chosen file
-    document.getElementById("item-photo").value = "";
     preview.src = url;
     preview.classList.remove("hidden");
-  } else if (!editingPhotoFile) {
+  } else {
     preview.classList.add("hidden");
   }
 });
@@ -250,27 +235,11 @@ document.getElementById("save-item-btn").addEventListener("click", async () => {
   saveBtn.textContent = "Saving...";
 
   try {
-    let photoUrl = null;
     const existing = editingItemId ? menuItemsCache.find((m) => m.id === editingItemId) : null;
-    if (existing) photoUrl = existing.photoUrl || null;
-
     const pastedUrl = document.getElementById("item-photo-url").value.trim();
+    const photoUrl = pastedUrl || (existing ? existing.photoUrl || "" : "");
 
-    if (pastedUrl) {
-      // Manual override: an externally-hosted image (GitHub, Imgur, etc.)
-      photoUrl = pastedUrl;
-    } else if (editingPhotoFile) {
-      // Default path: upload straight to Cloudinary (free, no card needed)
-      if (typeof CLOUDINARY_CLOUD_NAME === "undefined" || CLOUDINARY_CLOUD_NAME.startsWith("PASTE_")) {
-        errorEl.textContent = "Cloudinary isn't set up yet — paste your Cloud name and upload preset into cloudinary-config.js, or paste an Image URL instead.";
-        saveBtn.disabled = false;
-        saveBtn.textContent = "Save Item";
-        return;
-      }
-      photoUrl = await uploadToCloudinary(editingPhotoFile);
-    }
-
-    const data = { name, desc, price, category, tags, inStock, photoUrl: photoUrl || "" };
+    const data = { name, desc, price, category, tags, inStock, photoUrl };
 
     if (editingItemId) {
       await db.collection("menu").doc(editingItemId).update(data);
