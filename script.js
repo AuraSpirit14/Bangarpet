@@ -53,6 +53,8 @@ function orderId() {
 
 // ================= LOAD MENU (Firestore, falls back to local list) =================
 async function loadMenu() {
+  document.getElementById("menu-grid").innerHTML = `<p class="menu-loading">Loading menu...</p>`;
+
   if (typeof DEMO_MODE !== "undefined" && !DEMO_MODE) {
     try {
       const snap = await db.collection("menu").orderBy("name").get();
@@ -346,19 +348,47 @@ function resetCartAndForm() {
   closeDrawers();
 }
 
-// ---- Place Order: saves to Admin, then opens WhatsApp with the order summary ----
-document.getElementById("place-order-btn").addEventListener("click", async () => {
+// ---- Pay on Delivery/Pickup: goes straight to the Admin orders list, no WhatsApp popup ----
+document.getElementById("cod-order-btn").addEventListener("click", async () => {
   const data = validateForm();
   if (!data) return;
 
-  const btn = document.getElementById("place-order-btn");
+  const btn = document.getElementById("cod-order-btn");
   btn.disabled = true;
   btn.textContent = "Placing order...";
 
-  const { id, now, items, subtotal, delivery, total, record } = buildOrderRecord(data, "cod");
+  const { record } = buildOrderRecord(data, "cod");
 
   try {
     await saveOrderToFirestore(record);
+    document.getElementById("form-error").style.color = "#2F3B28";
+    document.getElementById("form-error").textContent =
+      `Order #${record.orderId} placed! Pay ${record.paymentMethod.toLowerCase()} — we'll start preparing it shortly.`;
+    setTimeout(() => resetCartAndForm(), 1800);
+  } catch (err) {
+    console.error("Couldn't save order:", err);
+    document.getElementById("form-error").style.color = "";
+    document.getElementById("form-error").textContent =
+      "Couldn't place your order — please try again, or use 'Order on WhatsApp' instead.";
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Pay on Delivery/Pickup";
+  }
+});
+
+// ---- Order on WhatsApp: opens a WhatsApp chat with the order summary ----
+document.getElementById("whatsapp-order-btn").addEventListener("click", async () => {
+  const data = validateForm();
+  if (!data) return;
+
+  const btn = document.getElementById("whatsapp-order-btn");
+  btn.disabled = true;
+  btn.textContent = "Opening WhatsApp...";
+
+  const { id, now, items, subtotal, delivery, total, record } = buildOrderRecord(data, "whatsapp");
+
+  try {
+    await saveOrderToFirestore(record); // still logged in Admin, tagged as a WhatsApp order
   } catch (err) {
     console.error("Couldn't save order to Firestore:", err);
     // Still continue to WhatsApp below so the order isn't lost — the kitchen still gets it via chat.
@@ -368,8 +398,9 @@ document.getElementById("place-order-btn").addEventListener("click", async () =>
   resetCartAndForm();
 
   btn.disabled = false;
-  btn.textContent = "Place Order · Pay on Delivery/Pickup";
+  btn.textContent = "Order on WhatsApp";
 });
+
 function sendWhatsAppOrder(id, now, data, items, subtotal, delivery, total) {
   const dateStr = now.toLocaleDateString("en-NZ") + " " + now.toLocaleTimeString("en-NZ", { hour: "2-digit", minute: "2-digit" });
   const itemLines = items.map((i) => `• ${i.qty}x ${i.name} — $${fmt(i.price * i.qty)}`).join("\n");
