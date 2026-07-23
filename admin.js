@@ -1,3 +1,14 @@
+// ================= LOCAL FILE WARNING =================
+// Uploads (Cloudinary) and some Firebase calls need a real http(s) origin — file:// silently hangs/fails.
+if (window.location.protocol === "file:") {
+  const banner = document.createElement("div");
+  banner.textContent =
+    "⚠️ This page is open as a local file. Photo uploads and some features won't work until this is served over http(s) — e.g. your GitHub Pages URL.";
+  banner.style.cssText =
+    "position:fixed;top:0;left:0;right:0;z-index:9999;background:#B33F2E;color:#fff;text-align:center;padding:10px 16px;font-family:sans-serif;font-size:13px;";
+  document.body.prepend(banner);
+}
+
 // ================= AUTH =================
 const loginScreen = document.getElementById("login-screen");
 const adminApp = document.getElementById("admin-app");
@@ -238,10 +249,6 @@ document.getElementById("save-item-btn").addEventListener("click", async () => {
   saveBtn.disabled = true;
   saveBtn.textContent = "Saving...";
 
-  const timeoutPromise = new Promise((_, reject) =>
-    setTimeout(() => reject(new Error("Save timed out — check your connection or ad blocker.")), 10000)
-  );
-
   try {
     let photoUrl = null;
     const existing = editingItemId ? menuItemsCache.find((m) => m.id === editingItemId) : null;
@@ -250,31 +257,32 @@ document.getElementById("save-item-btn").addEventListener("click", async () => {
     const pastedUrl = document.getElementById("item-photo-url").value.trim();
 
     if (pastedUrl) {
-      // Preferred path: an externally-hosted image (GitHub, Imgur, etc.) — no Firebase Storage needed at all.
+      // Manual override: an externally-hosted image (GitHub, Imgur, etc.)
       photoUrl = pastedUrl;
     } else if (editingPhotoFile) {
-      // Fallback path: direct upload — only works once Firebase Storage/Blaze is set up.
-      const path = `menu-photos/${Date.now()}_${editingPhotoFile.name}`;
-      const ref = storage.ref(path);
-      await Promise.race([ref.put(editingPhotoFile), timeoutPromise]);
-      photoUrl = await ref.getDownloadURL();
+      // Default path: upload straight to Cloudinary (free, no card needed)
+      if (typeof CLOUDINARY_CLOUD_NAME === "undefined" || CLOUDINARY_CLOUD_NAME.startsWith("PASTE_")) {
+        errorEl.textContent = "Cloudinary isn't set up yet — paste your Cloud name and upload preset into cloudinary-config.js, or paste an Image URL instead.";
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Save Item";
+        return;
+      }
+      photoUrl = await uploadToCloudinary(editingPhotoFile);
     }
 
     const data = { name, desc, price, category, tags, inStock, photoUrl: photoUrl || "" };
 
     if (editingItemId) {
-      await Promise.race([db.collection("menu").doc(editingItemId).update(data), timeoutPromise]);
+      await db.collection("menu").doc(editingItemId).update(data);
     } else {
-      await Promise.race([db.collection("menu").add(data), timeoutPromise]);
+      await db.collection("menu").add(data);
     }
 
     document.getElementById("item-modal-overlay").classList.remove("visible");
     await loadMenuAdmin();
   } catch (err) {
     console.error(err);
-    errorEl.textContent = err.message.includes("timed out")
-      ? "Save timed out — check your internet connection or try disabling any ad blocker."
-      : "Something went wrong saving this item. Please try again.";
+    errorEl.textContent = "Something went wrong saving this item. Please try again.";
   } finally {
     saveBtn.disabled = false;
     saveBtn.textContent = "Save Item";
