@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — The Chaya & Co.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body class="admin-body">
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen" class="login-screen">
+  <div class="login-card">
+    <p class="eyebrow">The Chaya &amp; Co.</p>
+    <h1>Admin Login</h1>
+    <p class="login-sub">Sign in to manage your menu, stock, and orders.</p>
+    <label class="field">
+      <span>Email</span>
+      <input type="email" id="login-email" autocomplete="username">
+    </label>
+    <label class="field">
+      <span>Password</span>
+      <input type="password" id="login-password" autocomplete="current-password">
+    </label>
+    <p class="form-error" id="login-error"></p>
+    <button class="btn btn-primary" id="login-btn">Sign In</button>
+    <p class="login-note">Don't have a login yet? Create one in Firebase Console → Authentication → Users → Add user, using the email/password you want to log in with.</p>
+  </div>
+</div>
+
+<!-- ADMIN APP (hidden until logged in) -->
+<div id="admin-app" class="admin-app hidden">
+
+  <header class="admin-header">
+    <div class="wrap admin-header-row">
+      <span class="brand">The Chaya &amp; Co. — Admin</span>
+      <div class="admin-header-actions">
+        <span id="admin-user-email" class="admin-user-email"></span>
+        <button class="btn btn-outline" id="logout-btn">Log Out</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap admin-tabs">
+    <button class="admin-tab-btn active" data-tab="orders">Orders</button>
+    <button class="admin-tab-btn" data-tab="menu">Menu &amp; Stock</button>
+  </div>
+
+  <!-- ORDERS TAB -->
+  <section class="wrap admin-panel" id="panel-orders">
+    <div class="admin-panel-head">
+      <h2>Orders</h2>
+      <p class="admin-panel-sub">Newest first. Update status as you go.</p>
+    </div>
+    <div id="orders-empty" class="admin-empty hidden">No orders yet. They'll appear here as soon as a customer checks out.</div>
+    <div id="orders-list" class="orders-list"></div>
+  </section>
+
+  <!-- MENU TAB -->
+  <section class="wrap admin-panel hidden" id="panel-menu">
+    <div class="admin-panel-head">
+      <h2>Menu &amp; Stock</h2>
+      <p class="admin-panel-sub">Add items, update photos and prices, and toggle stock on/off.</p>
+      <button class="btn btn-primary" id="add-item-btn">+ Add Menu Item</button>
+    </div>
+    <div id="menu-empty" class="admin-empty hidden">No menu items yet. Click "Add Menu Item" to create your first one.</div>
+    <div id="menu-admin-list" class="menu-admin-list"></div>
+  </section>
+
+</div>
+
+<!-- ITEM EDIT MODAL -->
+<div class="policy-overlay" id="item-modal-overlay">
+  <div class="policy-modal item-modal">
+    <button class="drawer-close" id="close-item-modal" aria-label="Close">✕</button>
+    <h3 id="item-modal-title">Edit Item</h3>
+
+    <label class="field">
+      <span>Name *</span>
+      <input type="text" id="item-name">
+    </label>
+    <label class="field">
+      <span>Description</span>
+      <input type="text" id="item-desc">
+    </label>
+    <div class="field-row">
+      <label class="field">
+        <span>Price (NZD) *</span>
+        <input type="number" step="0.01" min="0" id="item-price">
+      </label>
+      <label class="field">
+        <span>Category *</span>
+        <select id="item-category">
+          <option>Pani Puri</option>
+          <option>Chaat</option>
+          <option>Beverages</option>
+          <option>Combos</option>
+        </select>
+      </label>
+    </div>
+    <label class="field">
+      <span>Tags (comma separated, e.g. Bestseller, Vegan)</span>
+      <input type="text" id="item-tags">
+    </label>
+    <label class="field">
+      <span>Photo — upload a file, or paste an image link below</span>
+      <input type="file" id="item-photo" accept="image/*">
+      <img id="item-photo-preview" class="item-photo-preview hidden">
+    </label>
+    <label class="field">
+      <span>Image URL (e.g. from GitHub, Imgur — skips Firebase Storage entirely)</span>
+      <input type="text" id="item-photo-url" placeholder="https://raw.githubusercontent.com/yourname/chaya-photos/main/panipuri.png">
+    </label>
+    <label class="toggle-option item-instock-row">
+      <input type="checkbox" id="item-instock" checked> In stock (uncheck to mark Sold Out)
+    </label>
+
+    <p class="form-error" id="item-modal-error"></p>
+
+    <div class="checkout-actions">
+      <button type="button" class="btn btn-outline" id="delete-item-btn">Delete Item</button>
+      <button type="button" class="btn btn-primary" id="save-item-btn">Save Item</button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-storage-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>
