@@ -47,8 +47,22 @@ function currentDeliveryFee() {
 function cartTotal() {
   return cartSubtotal() + currentDeliveryFee();
 }
-function orderId() {
-  return "PC-" + Math.floor(1000 + Math.random() * 9000);
+let demoOrderCounter = 1000; // only used in demo mode, before Firebase is live
+
+async function nextOrderNumber() {
+  if (typeof DEMO_MODE !== "undefined" && !DEMO_MODE) {
+    const counterRef = db.collection("counters").doc("orders");
+    const next = await db.runTransaction(async (t) => {
+      const doc = await t.get(counterRef);
+      const current = doc.exists ? doc.data().last : 1000;
+      const updated = current + 1;
+      t.set(counterRef, { last: updated });
+      return updated;
+    });
+    return "PC-" + next;
+  }
+  demoOrderCounter += 1;
+  return "PC-" + demoOrderCounter;
 }
 
 // ================= LOAD MENU (Firestore, falls back to local list) =================
@@ -100,7 +114,7 @@ function renderMenu() {
     const card = document.createElement("div");
     card.className = "menu-card" + (soldOut ? " sold-out" : "");
     card.innerHTML = `
-      <div class="photo-placeholder">${item.photoUrl ? `<img src="${item.photoUrl}" alt="${item.name}">` : `Photo: ${item.name}`}</div>
+      <div class="photo-placeholder${item.photoUrl ? "" : " text-only"}">${item.photoUrl ? `<img src="${item.photoUrl}" alt="${item.name}">` : `Photo: ${item.name}`}</div>
       <div class="menu-card-body">
         <div class="menu-card-top">
           <span class="menu-card-name">${item.name}</span>
@@ -293,8 +307,8 @@ function validateForm() {
 }
 
 // ---- shared: build the order record from the current cart + form ----
-function buildOrderRecord(data, orderChannel) {
-  const id = orderId();
+async function buildOrderRecord(data, orderChannel) {
+  const id = await nextOrderNumber();
   const now = new Date();
   const entries = cartEntries();
   const items = entries.map(([itemId, qty]) => {
@@ -357,7 +371,7 @@ document.getElementById("cod-order-btn").addEventListener("click", async () => {
   btn.disabled = true;
   btn.textContent = "Placing order...";
 
-  const { record } = buildOrderRecord(data, "cod");
+  const { record } = await buildOrderRecord(data, "cod");
 
   try {
     await saveOrderToFirestore(record);
@@ -385,7 +399,7 @@ document.getElementById("whatsapp-order-btn").addEventListener("click", async ()
   btn.disabled = true;
   btn.textContent = "Opening WhatsApp...";
 
-  const { id, now, items, subtotal, delivery, total, record } = buildOrderRecord(data, "whatsapp");
+  const { id, now, items, subtotal, delivery, total, record } = await buildOrderRecord(data, "whatsapp");
 
   try {
     await saveOrderToFirestore(record); // still logged in Admin, tagged as a WhatsApp order
