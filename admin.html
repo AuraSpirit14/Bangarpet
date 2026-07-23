@@ -106,13 +106,9 @@
       <input type="text" id="item-tags">
     </label>
     <label class="field">
-      <span>Photo — upload a file, or paste an image link below</span>
-      <input type="file" id="item-photo" accept="image/*">
+      <span>Photo — paste an image link (upload the photo to your GitHub repo first, then paste its raw link here) *</span>
+      <input type="text" id="item-photo-url" placeholder="https://raw.githubusercontent.com/yourname/Bangarpet/main/photos/panipuri.png">
       <img id="item-photo-preview" class="item-photo-preview hidden">
-    </label>
-    <label class="field">
-      <span>Image URL (e.g. from GitHub, Imgur — skips Firebase Storage entirely)</span>
-      <input type="text" id="item-photo-url" placeholder="https://raw.githubusercontent.com/yourname/chaya-photos/main/panipuri.png">
     </label>
     <label class="toggle-option item-instock-row">
       <input type="checkbox" id="item-instock" checked> In stock (uncheck to mark Sold Out)
