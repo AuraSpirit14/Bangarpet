@@ -300,6 +300,7 @@ document.getElementById("menu-grid").addEventListener("click", (e) => {
   const current = cart[id] || 0;
   cart[id] = action === "inc" ? current + 1 : Math.max(0, current - 1);
   renderMenu();
+  renderSignatureCards();
   renderCart();
   updateHeaderCartBadge();
 });
