@@ -42,6 +42,7 @@ if (typeof DEMO_MODE !== "undefined" && !DEMO_MODE) {
       document.getElementById("admin-user-email").textContent = user.email;
       startOrdersListener();
       loadMenuAdmin();
+      loadSiteEditor();
     } else {
       loginScreen.classList.remove("hidden");
       adminApp.classList.add("hidden");
@@ -59,6 +60,7 @@ document.querySelectorAll(".admin-tab-btn").forEach((btn) => {
     btn.classList.add("active");
     document.getElementById("panel-orders").classList.toggle("hidden", btn.dataset.tab !== "orders");
     document.getElementById("panel-menu").classList.toggle("hidden", btn.dataset.tab !== "menu");
+    document.getElementById("panel-site").classList.toggle("hidden", btn.dataset.tab !== "site");
   });
 });
 
@@ -273,4 +275,126 @@ document.getElementById("delete-item-btn").addEventListener("click", async () =>
 
 document.getElementById("item-modal-overlay").addEventListener("click", (e) => {
   if (e.target.id === "item-modal-overlay") e.target.classList.remove("visible");
+});
+
+// ================= SITE EDITOR =================
+// Maps every Admin input field to a dot-path in the site content object
+// (e.g. "hero.headline" -> the <hero.headline> field in DEFAULT_SITE_CONTENT).
+const SITE_FIELD_MAP = [
+  ["announcement.text", "site-announcement-text"],
+  ["announcement.bgColor", "site-announcement-bg"],
+  ["announcement.textColor", "site-announcement-color"],
+
+  ["hero.eyebrow", "site-hero-eyebrow"],
+  ["hero.headline", "site-hero-headline"],
+  ["hero.copy", "site-hero-copy"],
+  ["hero.cta1Text", "site-hero-cta1"],
+  ["hero.cta2Text", "site-hero-cta2"],
+  ["hero.image", "site-hero-image"],
+  ["hero.imageWidth", "site-hero-image-width", "number"],
+  ["hero.imageShape", "site-hero-image-shape"],
+  ["hero.headlineSize", "site-hero-headline-size", "number"],
+  ["hero.bodySize", "site-hero-body-size", "number"],
+  ["hero.padding", "site-hero-padding"],
+
+  ["signature.eyebrow", "site-signature-eyebrow"],
+  ["signature.padding", "site-signature-padding"],
+  ["signature.cards.0.image", "site-sig-1-image"],
+  ["signature.cards.0.name", "site-sig-1-name"],
+  ["signature.cards.0.price", "site-sig-1-price"],
+  ["signature.cards.1.image", "site-sig-2-image"],
+  ["signature.cards.1.name", "site-sig-2-name"],
+  ["signature.cards.1.price", "site-sig-2-price"],
+  ["signature.cards.2.image", "site-sig-3-image"],
+  ["signature.cards.2.name", "site-sig-3-name"],
+  ["signature.cards.2.price", "site-sig-3-price"],
+
+  ["menuSection.eyebrow", "site-menu-eyebrow"],
+  ["menuSection.title", "site-menu-title"],
+  ["menuSection.quote", "site-menu-quote"],
+
+  ["story.eyebrow", "site-story-eyebrow"],
+  ["story.headline", "site-story-headline"],
+  ["story.paragraph1", "site-story-para1"],
+  ["story.paragraph2", "site-story-para2"],
+  ["story.image", "site-story-image"],
+  ["story.imageShape", "site-story-image-shape"],
+  ["story.headlineSize", "site-story-headline-size", "number"],
+  ["story.padding", "site-story-padding"],
+
+  ["delivery.eyebrow", "site-delivery-eyebrow"],
+  ["delivery.title", "site-delivery-title"],
+  ["delivery.padding", "site-delivery-padding"],
+  ["delivery.card1Title", "site-delivery-card1-title"],
+  ["delivery.card1Text", "site-delivery-card1-text"],
+  ["delivery.card2Title", "site-delivery-card2-title"],
+  ["delivery.card2Text", "site-delivery-card2-text"],
+  ["delivery.card3Title", "site-delivery-card3-title"],
+  ["delivery.card3Text", "site-delivery-card3-text"],
+
+  ["findUs.eyebrow", "site-findus-eyebrow"],
+  ["findUs.headline", "site-findus-headline"],
+  ["findUs.line1", "site-findus-line1"],
+  ["findUs.line2", "site-findus-line2"],
+  ["findUs.line3", "site-findus-line3"],
+  ["findUs.mapImage", "site-findus-map-image"],
+  ["findUs.mapLink", "site-findus-map-link"],
+
+  ["footer.brand", "site-footer-brand"],
+  ["footer.tagline", "site-footer-tagline"],
+  ["footer.address", "site-footer-address"],
+  ["footer.contact", "site-footer-contact"],
+  ["footer.copyright", "site-footer-copyright"],
+];
+
+function populateSiteEditor(content) {
+  SITE_FIELD_MAP.forEach(([path, id]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const val = getByPath(content, path);
+    if (val !== undefined && val !== null) el.value = val;
+  });
+}
+
+function gatherSiteEditor() {
+  const result = JSON.parse(JSON.stringify(DEFAULT_SITE_CONTENT));
+  SITE_FIELD_MAP.forEach(([path, id, type]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    let val = el.value;
+    if (type === "number") val = Number(val);
+    setByPath(result, path, val);
+  });
+  return result;
+}
+
+async function loadSiteEditor() {
+  let content = DEFAULT_SITE_CONTENT;
+  try {
+    const doc = await db.collection("siteSettings").doc("content").get();
+    if (doc.exists) content = mergeDeep(DEFAULT_SITE_CONTENT, doc.data());
+  } catch (err) {
+    console.error("Couldn't load site content:", err);
+  }
+  populateSiteEditor(content);
+}
+
+document.getElementById("save-site-btn").addEventListener("click", async () => {
+  const btn = document.getElementById("save-site-btn");
+  const statusEl = document.getElementById("site-save-status");
+  btn.disabled = true;
+  btn.textContent = "Saving...";
+  statusEl.textContent = "";
+
+  try {
+    const content = gatherSiteEditor();
+    await db.collection("siteSettings").doc("content").set(content);
+    statusEl.textContent = "Saved! Your site is updated live.";
+  } catch (err) {
+    console.error(err);
+    statusEl.textContent = "Something went wrong saving. Please try again.";
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Save Changes";
+  }
 });
