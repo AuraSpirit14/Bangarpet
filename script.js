@@ -79,6 +79,139 @@ function buildStatusLink(orderId) {
   return window.location.origin + path + "status.html?order=" + encodeURIComponent(orderId);
 }
 
+// ================= SITE CONTENT (Site Editor in Admin) =================
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el && value !== undefined && value !== null) el.textContent = value;
+}
+function setHtmlLines(id, value) {
+  const el = document.getElementById(id);
+  if (el && value !== undefined && value !== null) el.innerHTML = String(value).split("\n").join("<br>");
+}
+function applyPadding(el, size) {
+  if (!el) return;
+  const map = { compact: "32px 0", normal: "72px 0", spacious: "120px 0" };
+  el.style.padding = map[size] || map.normal;
+}
+function applyImageShape(img, shape, widthPx) {
+  if (!img) return;
+  const radiusMap = { square: "4px", rounded: "18px", circle: "50%", pill: "999px" };
+  img.style.borderRadius = radiusMap[shape] || radiusMap.rounded;
+  if (widthPx) img.style.width = widthPx + "px";
+  img.style.objectFit = "cover";
+  if (shape === "circle") img.style.aspectRatio = "1 / 1";
+}
+
+function applySiteContent(c) {
+  if (!c) return;
+
+  const ann = document.getElementById("announce-bar");
+  if (ann && c.announcement) {
+    setText("announce-bar", c.announcement.text);
+    ann.style.background = c.announcement.bgColor || "";
+    ann.style.color = c.announcement.textColor || "";
+  }
+
+  if (c.hero) {
+    setText("hero-eyebrow", c.hero.eyebrow);
+    setHtmlLines("hero-headline", c.hero.headline);
+    setText("hero-copy", c.hero.copy);
+    setText("hero-cta1", c.hero.cta1Text);
+    setText("hero-cta2", c.hero.cta2Text);
+    const heroImg = document.getElementById("hero-image");
+    if (heroImg && c.hero.image) {
+      heroImg.src = c.hero.image;
+      applyImageShape(heroImg, c.hero.imageShape, c.hero.imageWidth);
+    }
+    const headlineEl = document.getElementById("hero-headline");
+    if (headlineEl && c.hero.headlineSize) headlineEl.style.fontSize = c.hero.headlineSize + "px";
+    const copyEl = document.getElementById("hero-copy");
+    if (copyEl && c.hero.bodySize) copyEl.style.fontSize = c.hero.bodySize + "px";
+    applyPadding(document.getElementById("section-hero"), c.hero.padding);
+  }
+
+  if (c.signature) {
+    setText("signature-eyebrow", c.signature.eyebrow);
+    (c.signature.cards || []).forEach((card, i) => {
+      const n = i + 1;
+      const img = document.getElementById(`signature-card-${n}-img`);
+      if (img && card.image) img.src = card.image;
+      setText(`signature-card-${n}-name`, card.name);
+      setText(`signature-card-${n}-price`, card.price);
+    });
+    applyPadding(document.getElementById("section-signature"), c.signature.padding);
+  }
+
+  if (c.menuSection) {
+    setText("menu-eyebrow", c.menuSection.eyebrow);
+    setText("menu-title", c.menuSection.title);
+    setText("menu-quote-text", c.menuSection.quote);
+  }
+
+  if (c.story) {
+    setText("story-eyebrow", c.story.eyebrow);
+    setText("story-headline", c.story.headline);
+    setText("story-para1", c.story.paragraph1);
+    setText("story-para2", c.story.paragraph2);
+    const storyImg = document.getElementById("story-image");
+    if (storyImg && c.story.image) {
+      storyImg.src = c.story.image;
+      applyImageShape(storyImg, c.story.imageShape, null);
+    }
+    const storyHeadlineEl = document.getElementById("story-headline");
+    if (storyHeadlineEl && c.story.headlineSize) storyHeadlineEl.style.fontSize = c.story.headlineSize + "px";
+    applyPadding(document.getElementById("story"), c.story.padding);
+  }
+
+  if (c.delivery) {
+    setText("delivery-eyebrow", c.delivery.eyebrow);
+    setText("delivery-title", c.delivery.title);
+    setText("delivery-card1-title", c.delivery.card1Title);
+    setText("delivery-card1-text", c.delivery.card1Text);
+    setText("delivery-card2-title", c.delivery.card2Title);
+    setText("delivery-card2-text", c.delivery.card2Text);
+    setText("delivery-card3-title", c.delivery.card3Title);
+    setHtmlLines("delivery-card3-text", c.delivery.card3Text);
+    applyPadding(document.getElementById("delivery"), c.delivery.padding);
+  }
+
+  if (c.findUs) {
+    setText("findus-eyebrow", c.findUs.eyebrow);
+    setText("findus-headline", c.findUs.headline);
+    setText("findus-line1", c.findUs.line1);
+    setText("findus-line2", c.findUs.line2);
+    setText("findus-line3", c.findUs.line3);
+    const mapLink = document.getElementById("findus-map-link");
+    if (mapLink && c.findUs.mapLink) mapLink.href = c.findUs.mapLink;
+    const mapImg = document.getElementById("findus-map-image");
+    if (mapImg && c.findUs.mapImage) mapImg.src = c.findUs.mapImage;
+  }
+
+  if (c.footer) {
+    setText("footer-brand", c.footer.brand);
+    setText("footer-tagline", c.footer.tagline);
+    setText("footer-address", c.footer.address);
+    setText("footer-contact", c.footer.contact);
+    setText("footer-copyright", c.footer.copyright);
+  }
+}
+
+function loadSiteContent() {
+  const defaults = typeof DEFAULT_SITE_CONTENT !== "undefined" ? DEFAULT_SITE_CONTENT : null;
+  applySiteContent(defaults);
+
+  if (typeof DEMO_MODE !== "undefined" && !DEMO_MODE) {
+    db.collection("siteSettings")
+      .doc("content")
+      .onSnapshot(
+        (doc) => {
+          if (doc.exists) applySiteContent(mergeDeep(defaults, doc.data()));
+        },
+        (err) => console.error("Couldn't load site content:", err)
+      );
+  }
+}
+
 // ================= LOAD MENU (Firestore, falls back to local list) =================
 async function loadMenu() {
   document.getElementById("menu-grid").innerHTML = `<p class="menu-loading">Loading menu...</p>`;
@@ -565,4 +698,5 @@ document.getElementById("policy-overlay").addEventListener("click", (e) => {
 });
 
 // ================= INIT =================
+loadSiteContent();
 loadMenu();
