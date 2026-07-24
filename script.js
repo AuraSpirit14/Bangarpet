@@ -230,6 +230,7 @@ async function loadMenu() {
   }
   renderTabs();
   renderMenu();
+  renderSignatureCards();
   renderCart();
 }
 
@@ -299,6 +300,41 @@ document.getElementById("menu-grid").addEventListener("click", (e) => {
   const current = cart[id] || 0;
   cart[id] = action === "inc" ? current + 1 : Math.max(0, current - 1);
   renderMenu();
+  renderCart();
+  updateHeaderCartBadge();
+});
+
+// ================= BESTSELLERS QUICK-ADD =================
+function renderSignatureCards() {
+  document.querySelectorAll("#signature-row .signature-card[data-id]").forEach((card) => {
+    const id = card.dataset.id;
+    const actionEl = card.querySelector(".signature-card-action");
+    if (!actionEl) return;
+    const item = findItem(id);
+    if (!item) { actionEl.innerHTML = ""; return; }
+    const qty = cart[id] || 0;
+    const soldOut = item.inStock === false;
+    actionEl.innerHTML = soldOut
+      ? `<span class="tag-chip sold-out-chip">Sold Out</span>`
+      : qty > 0
+      ? `<div class="qty-control">
+          <button data-action="dec" data-id="${id}">−</button>
+          <span>${qty}</span>
+          <button data-action="inc" data-id="${id}">+</button>
+        </div>`
+      : `<button class="add-btn" data-action="inc" data-id="${id}">Add</button>`;
+  });
+}
+
+document.getElementById("signature-row").addEventListener("click", (e) => {
+  const btn = e.target.closest("button[data-id]");
+  if (!btn) return;
+  const id = btn.dataset.id;
+  const action = btn.dataset.action;
+  const current = cart[id] || 0;
+  cart[id] = action === "inc" ? current + 1 : Math.max(0, current - 1);
+  renderMenu();
+  renderSignatureCards();
   renderCart();
   updateHeaderCartBadge();
 });
