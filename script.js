@@ -318,7 +318,7 @@ function renderCart() {
     const line = document.createElement("div");
     line.className = "cart-line";
     line.innerHTML = `
-      <div class="cart-line-photo">${item.photoUrl ? `<img src="${item.photoUrl}" alt="${item.name}">` : ""}</div>
+      <div class="cart-line-photo" style="${item.photoUrl ? `background-image:url('${item.photoUrl}')` : ""}"></div>
       <div class="cart-line-info">
         <div class="cart-line-name">${item.name}</div>
         <div class="cart-line-price">$${fmt(item.price * qty)}</div>
