@@ -11,7 +11,7 @@
 <body>
 
 <!-- announcement bar -->
-<div class="announce-bar">Today's special: Sev-Puri · Takeaway ready in ~20 min · Delivering across central Rotorua</div>
+<div class="announce-bar" id="announce-bar">Today's special: Sev-Puri · Takeaway ready in ~20 min · Delivering across central Rotorua</div>
 
 <!-- header -->
 <header class="site-header" id="site-header">
@@ -38,40 +38,40 @@
 <div id="top"></div>
 
 <!-- hero -->
-<section class="hero">
+<section class="hero" id="section-hero">
   <div class="wrap hero-inner">
     <div class="hero-text">
-      <p class="eyebrow">Artisanal Bites · New Zealand</p>
-      <h1>Street food, treated<br>like it deserves a menu card.</h1>
-      <p class="hero-copy">Every puri is filled to order. Every chutney is made the same morning it's served. Order ahead for Takeaway, or have it delivered across Rotorua.</p>
+      <p class="eyebrow" id="hero-eyebrow">Artisanal Bites · New Zealand</p>
+      <h1 id="hero-headline">Street food, treated<br>like it deserves a menu card.</h1>
+      <p class="hero-copy" id="hero-copy">Every puri is filled to order. Every chutney is made the same morning it's served. Order ahead for Takeaway, or have it delivered across Rotorua.</p>
       <div class="hero-ctas">
-        <a href="#menu" class="btn btn-primary">Order Now</a>
-        <a href="#menu" class="btn btn-outline">View Menu</a>
+        <a href="#menu" class="btn btn-primary" id="hero-cta1">Order Now</a>
+        <a href="#menu" class="btn btn-outline" id="hero-cta2">View Menu</a>
       </div>
     </div>
-    <div class="about-photo"><img src="./photos/Staring.png" width="270" alt="Signature dish, plated on marble"></div>
+    <div class="about-photo"><img src="./photos/Staring.png" width="270" alt="Signature dish, plated on marble" id="hero-image"></div>
   </div>
 </section>
 
 <!-- signature strip -->
-<section class="signature-strip">
+<section class="signature-strip" id="section-signature">
   <div class="wrap">
-    <p class="eyebrow center">Bestsellers</p>
+    <p class="eyebrow center" id="signature-eyebrow">Bestsellers</p>
     <div class="signature-row">
       <div class="signature-card">
-        <div class="photo-placeholder"><img src="./photos/panipuri.png" alt="Classic Pani Puri"></div>
-        <h3>Classic Pani Puri</h3>
-        <p>$8.00</p>
+        <div class="photo-placeholder"><img src="./photos/panipuri.png" alt="Classic Pani Puri" id="signature-card-1-img"></div>
+        <h3 id="signature-card-1-name">Classic Pani Puri</h3>
+        <p id="signature-card-1-price">$8.00</p>
       </div>
       <div class="signature-card">
-        <div class="photo-placeholder"><img src="./photos/BhelPuri.png" alt="Bhel Puri"></div>
-        <h3>Bhel Puri</h3>
-        <p>$8.50</p>
+        <div class="photo-placeholder"><img src="./photos/BhelPuri.png" alt="Bhel Puri" id="signature-card-2-img"></div>
+        <h3 id="signature-card-2-name">Bhel Puri</h3>
+        <p id="signature-card-2-price">$8.50</p>
       </div>
       <div class="signature-card">
-        <div class="photo-placeholder"><img src="./photos/DahiPuri.png" alt="Dahi Puri"></div>
-        <h3>Dahi Puri</h3>
-        <p>$9.00</p>
+        <div class="photo-placeholder"><img src="./photos/DahiPuri.png" alt="Dahi Puri" id="signature-card-3-img"></div>
+        <h3 id="signature-card-3-name">Dahi Puri</h3>
+        <p id="signature-card-3-price">$9.00</p>
       </div>
     </div>
   </div>
@@ -80,14 +80,14 @@
 <!-- menu -->
 <section class="menu-section" id="menu">
   <div class="wrap">
-    <p class="eyebrow center">The Menu</p>
-    <h2 class="section-title center">Order Ahead</h2>
+    <p class="eyebrow center" id="menu-eyebrow">The Menu</p>
+    <h2 class="section-title center" id="menu-title">Order Ahead</h2>
 
     <div class="category-tabs" id="category-tabs"></div>
     
 
     <div class="editorial-note">
-      <p>"Our masala pani is steeped fresh every morning — no shortcuts, no concentrate." — Kanha, founder</p>
+      <p id="menu-quote-text">"Our masala pani is steeped fresh every morning — no shortcuts, no concentrate." — Kanha, founder</p>
     </div>
 
     <div class="menu-grid" id="menu-grid"></div>
@@ -97,12 +97,12 @@
 <!-- story -->
 <section class="story" id="story">
   <div class="wrap about-grid">
-    <div class="photo-placeholder"><img src="./photos/ourstory.png" alt="Hands plating chaat"></div>
+    <div class="photo-placeholder"><img src="./photos/ourstory.png" alt="Hands plating chaat" id="story-image"></div>
     <div class="about-copy">
-      <p class="eyebrow">Our Story</p>
-      <h2>From a Bangarpet Kolar street cart to a Rotorua kitchen</h2>
-      <p>The Chaya & Co. began as a single market stall in 2005, built on recipes carried over from Kolar. Twenty One years on, we're still a small, family-run kitchen — everything made fresh, nothing sitting under a heat lamp.</p>
-      <p>We're proud to be a New Zealand based business, serving our community one order at a time.</p>
+      <p class="eyebrow" id="story-eyebrow">Our Story</p>
+      <h2 id="story-headline">From a Bangarpet Kolar street cart to a Rotorua kitchen</h2>
+      <p id="story-para1">The Chaya & Co. began as a single market stall in 2005, built on recipes carried over from Kolar. Twenty One years on, we're still a small, family-run kitchen — everything made fresh, nothing sitting under a heat lamp.</p>
+      <p id="story-para2">We're proud to be a New Zealand based business, serving our community one order at a time.</p>
     </div>
   </div>
 </section>
@@ -110,20 +110,20 @@
 <!-- delivery & Takeaway -->
 <section class="delivery-info" id="delivery">
   <div class="wrap">
-    <p class="eyebrow center">Delivery &amp; Takeaway</p>
-    <h2 class="section-title center">How to Order</h2>
+    <p class="eyebrow center" id="delivery-eyebrow">Delivery &amp; Takeaway</p>
+    <h2 class="section-title center" id="delivery-title">How to Order</h2>
     <div class="info-grid">
       <div class="info-card">
-        <h3>Takeaway</h3>
-        <p>Ready in approximately 20 minutes. Order ahead and skip the queue at our Cuba Street kitchen.</p>
+        <h3 id="delivery-card1-title">Takeaway</h3>
+        <p id="delivery-card1-text">Ready in approximately 20 minutes. Order ahead and skip the queue at our Cuba Street kitchen.</p>
       </div>
       <div class="info-card">
-        <h3>Delivery</h3>
-        <p>We deliver across central Rotorua. Flat delivery fee of $5.00. Typical delivery time is 35–45 minutes.</p>
+        <h3 id="delivery-card2-title">Delivery</h3>
+        <p id="delivery-card2-text">We deliver across central Rotorua. Flat delivery fee of $5.00. Typical delivery time is 35–45 minutes.</p>
       </div>
       <div class="info-card">
-        <h3>Hours</h3>
-        <p>Monday–Sunday, 03:30pm–8:00pm.<br>Closed Saturday.</p>
+        <h3 id="delivery-card3-title">Hours</h3>
+        <p id="delivery-card3-text">Monday–Sunday, 03:30pm–8:00pm.<br>Closed Saturday.</p>
       </div>
     </div>
   </div>
@@ -133,16 +133,16 @@
 <section class="find-us" id="find-us">
   <div class="wrap find-us-grid">
     <div class="find-us-text">
-      <p class="eyebrow">Find Us</p>
-      <h2>The Chaya & Co.</h2>
-      <p class="find-us-line">44 Cuba Street, Te Aro, Rotorua 6011</p>
-      <p class="find-us-line">Monday–Sunday, 03:30pm–8:00pm</p>
-      <p class="find-us-line">021 123 4567 · help@thechayaandco.nz</p>
+      <p class="eyebrow" id="findus-eyebrow">Find Us</p>
+      <h2 id="findus-headline">The Chaya & Co.</h2>
+      <p class="find-us-line" id="findus-line1">44 Cuba Street, Te Aro, Rotorua 6011</p>
+      <p class="find-us-line" id="findus-line2">Monday–Sunday, 03:30pm–8:00pm</p>
+      <p class="find-us-line" id="findus-line3">021 123 4567 · help@thechayaandco.nz</p>
     </div>
     <div class="map-placeholder">
       <a href="https://www.google.com/maps/place/28+Manuka+Crescent,+Hillcrest,+Rotorua+3015,+New+Zealand/@-38.1518837,176.2355002,18.94z/data=!4m6!3m5!1s0x6d6c27400b996f21:0x37cf17543a4d4322!8m2!3d-38.1521317!4d176.2364278!16s%2Fg%2F11gfd5j300"
-         target="_blank" rel="noopener" class="map-link">
-        <div class="photo-placeholder"><img src="./photos/map.png" alt="Map showing The Chaya & Co. location — tap to open in Google Maps" class="map-image"></div>
+         target="_blank" rel="noopener" class="map-link" id="findus-map-link">
+        <div class="photo-placeholder"><img src="./photos/map.png" alt="Map showing The Chaya & Co. location — tap to open in Google Maps" class="map-image" id="findus-map-image"></div>
       </a>
     </div>
   </div>
@@ -152,10 +152,10 @@
 <footer class="site-footer">
   <div class="wrap footer-grid">
     <div class="footer-col">
-      <strong class="footer-brand">The Chaya & Co.</strong>
-      <p>This is a New Zealand based business.</p>
-      <p>44 Cuba Street, Te Aro, Rotorua 6011</p>
-      <p>021 123 4567 · hello@thechayaandco.nz</p>
+      <strong class="footer-brand" id="footer-brand">The Chaya & Co.</strong>
+      <p id="footer-tagline">This is a New Zealand based business.</p>
+      <p id="footer-address">44 Cuba Street, Te Aro, Rotorua 6011</p>
+      <p id="footer-contact">021 123 4567 · hello@thechayaandco.nz</p>
     </div>
     <div class="footer-col">
       <strong>Policies</strong>
@@ -174,7 +174,7 @@
       <a class="footer-whatsapp" href="#" id="footer-whatsapp-link">Message us on WhatsApp</a>
     </div>
   </div>
-  <div class="wrap footer-bottom">© 2026 The Chaya & Co. All prices in NZD RTG.</div>
+  <div class="wrap footer-bottom" id="footer-copyright">© 2026 The Chaya & Co. All prices in NZD RTG.</div>
 </footer>
 
 <!-- mobile sticky bar -->
@@ -298,6 +298,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-storage-compat.js"></script>
 <script src="firebase-config.js"></script>
-<script src="script.js?v=4"></script>
+<script src="site-content-defaults.js?v=1"></script>
+<script src="script.js?v=6"></script>
 </body>
 </html>
