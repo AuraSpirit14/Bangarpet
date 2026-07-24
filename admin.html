@@ -8,6 +8,60 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css?v=3">
 <link rel="stylesheet" href="admin.css?v=3">
+<style>
+  .site-editor-group { margin-bottom: 14px; }
+  .site-editor-group summary {
+    cursor: pointer;
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 17px;
+    padding: 14px 16px;
+    background: #fff;
+    border-radius: 12px;
+  }
+  .site-editor-group[open] summary { border-radius: 12px 12px 0 0; }
+  .site-editor-body {
+    background: #fff;
+    padding: 16px;
+    border-radius: 0 0 12px 12px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .site-editor-body .field-full { grid-column: 1 / -1; }
+  .site-editor-body label.field span { font-size: 13px; }
+  .site-editor-body textarea {
+    width: 100%;
+    min-height: 64px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd4c0;
+    font-family: 'Jost', sans-serif;
+    font-size: 14px;
+    resize: vertical;
+  }
+  .site-editor-body select, .site-editor-body input[type="color"] { width: 100%; }
+  .site-editor-body input[type="color"] { height: 40px; padding: 2px; cursor: pointer; }
+  .signature-card-fields {
+    grid-column: 1 / -1;
+    border-top: 1px dashed #ddd4c0;
+    padding-top: 12px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .signature-card-fields .card-label { grid-column: 1 / -1; font-weight: 600; font-size: 13px; color: #9a8f6f; }
+  #site-save-bar {
+    position: sticky;
+    bottom: 0;
+    background: #FBF6EE;
+    padding: 14px 0;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  #site-save-status { font-size: 13px; color: #2F3B28; }
+</style>
 </head>
 <body class="admin-body">
 
@@ -47,6 +101,7 @@
   <div class="wrap admin-tabs">
     <button class="admin-tab-btn active" data-tab="orders">Orders</button>
     <button class="admin-tab-btn" data-tab="menu">Menu &amp; Stock</button>
+    <button class="admin-tab-btn" data-tab="site">Site Editor</button>
   </div>
 
   <!-- ORDERS TAB -->
@@ -68,6 +123,180 @@
     </div>
     <div id="menu-empty" class="admin-empty hidden">No menu items yet. Click "Add Menu Item" to create your first one.</div>
     <div id="menu-admin-list" class="menu-admin-list"></div>
+  </section>
+
+  <!-- SITE EDITOR TAB -->
+  <section class="wrap admin-panel hidden" id="panel-site">
+    <div class="admin-panel-head">
+      <h2>Site Editor</h2>
+      <p class="admin-panel-sub">Edit every section of your homepage — text, photos, image shape/size, font size, and spacing. Changes go live the moment you hit Save.</p>
+    </div>
+
+    <details class="site-editor-group" open>
+      <summary>Announcement Bar</summary>
+      <div class="site-editor-body">
+        <label class="field field-full"><span>Banner text</span><input type="text" id="site-announcement-text"></label>
+        <label class="field"><span>Background color</span><input type="color" id="site-announcement-bg"></label>
+        <label class="field"><span>Text color</span><input type="color" id="site-announcement-color"></label>
+      </div>
+    </details>
+
+    <details class="site-editor-group">
+      <summary>Hero Section (top banner)</summary>
+      <div class="site-editor-body">
+        <label class="field field-full"><span>Small label above headline</span><input type="text" id="site-hero-eyebrow"></label>
+        <label class="field field-full"><span>Headline (use a new line for a line break)</span><textarea id="site-hero-headline"></textarea></label>
+        <label class="field field-full"><span>Description text</span><textarea id="site-hero-copy"></textarea></label>
+        <label class="field"><span>Button 1 text</span><input type="text" id="site-hero-cta1"></label>
+        <label class="field"><span>Button 2 text</span><input type="text" id="site-hero-cta2"></label>
+        <label class="field field-full"><span>Photo URL</span><input type="text" id="site-hero-image" placeholder="https://raw.githubusercontent.com/..."></label>
+        <label class="field"><span>Photo width (px)</span><input type="number" id="site-hero-image-width" min="80" max="800"></label>
+        <label class="field">
+          <span>Photo shape</span>
+          <select id="site-hero-image-shape">
+            <option value="square">Square corners</option>
+            <option value="rounded">Rounded corners</option>
+            <option value="circle">Circle</option>
+            <option value="pill">Pill</option>
+          </select>
+        </label>
+        <label class="field"><span>Headline size (px)</span><input type="number" id="site-hero-headline-size" min="20" max="90"></label>
+        <label class="field"><span>Body text size (px)</span><input type="number" id="site-hero-body-size" min="12" max="28"></label>
+        <label class="field">
+          <span>Section spacing</span>
+          <select id="site-hero-padding">
+            <option value="compact">Compact</option>
+            <option value="normal">Normal</option>
+            <option value="spacious">Spacious</option>
+          </select>
+        </label>
+      </div>
+    </details>
+
+    <details class="site-editor-group">
+      <summary>Bestsellers Strip</summary>
+      <div class="site-editor-body">
+        <label class="field field-full"><span>Small label</span><input type="text" id="site-signature-eyebrow"></label>
+        <label class="field">
+          <span>Section spacing</span>
+          <select id="site-signature-padding">
+            <option value="compact">Compact</option>
+            <option value="normal">Normal</option>
+            <option value="spacious">Spacious</option>
+          </select>
+        </label>
+        <div></div>
+
+        <div class="signature-card-fields">
+          <div class="card-label">Card 1</div>
+          <label class="field field-full"><span>Photo URL</span><input type="text" id="site-sig-1-image"></label>
+          <label class="field"><span>Name</span><input type="text" id="site-sig-1-name"></label>
+          <label class="field"><span>Price</span><input type="text" id="site-sig-1-price"></label>
+        </div>
+        <div class="signature-card-fields">
+          <div class="card-label">Card 2</div>
+          <label class="field field-full"><span>Photo URL</span><input type="text" id="site-sig-2-image"></label>
+          <label class="field"><span>Name</span><input type="text" id="site-sig-2-name"></label>
+          <label class="field"><span>Price</span><input type="text" id="site-sig-2-price"></label>
+        </div>
+        <div class="signature-card-fields">
+          <div class="card-label">Card 3</div>
+          <label class="field field-full"><span>Photo URL</span><input type="text" id="site-sig-3-image"></label>
+          <label class="field"><span>Name</span><input type="text" id="site-sig-3-name"></label>
+          <label class="field"><span>Price</span><input type="text" id="site-sig-3-price"></label>
+        </div>
+      </div>
+    </details>
+
+    <details class="site-editor-group">
+      <summary>Menu Section (heading above your food list)</summary>
+      <div class="site-editor-body">
+        <label class="field"><span>Small label</span><input type="text" id="site-menu-eyebrow"></label>
+        <label class="field"><span>Title</span><input type="text" id="site-menu-title"></label>
+        <label class="field field-full"><span>Quote line</span><textarea id="site-menu-quote"></textarea></label>
+      </div>
+    </details>
+
+    <details class="site-editor-group">
+      <summary>Our Story Section</summary>
+      <div class="site-editor-body">
+        <label class="field field-full"><span>Small label</span><input type="text" id="site-story-eyebrow"></label>
+        <label class="field field-full"><span>Headline</span><input type="text" id="site-story-headline"></label>
+        <label class="field field-full"><span>Paragraph 1</span><textarea id="site-story-para1"></textarea></label>
+        <label class="field field-full"><span>Paragraph 2</span><textarea id="site-story-para2"></textarea></label>
+        <label class="field field-full"><span>Photo URL</span><input type="text" id="site-story-image"></label>
+        <label class="field">
+          <span>Photo shape</span>
+          <select id="site-story-image-shape">
+            <option value="square">Square corners</option>
+            <option value="rounded">Rounded corners</option>
+            <option value="circle">Circle</option>
+            <option value="pill">Pill</option>
+          </select>
+        </label>
+        <label class="field"><span>Headline size (px)</span><input type="number" id="site-story-headline-size" min="18" max="60"></label>
+        <label class="field">
+          <span>Section spacing</span>
+          <select id="site-story-padding">
+            <option value="compact">Compact</option>
+            <option value="normal">Normal</option>
+            <option value="spacious">Spacious</option>
+          </select>
+        </label>
+      </div>
+    </details>
+
+    <details class="site-editor-group">
+      <summary>Delivery &amp; Takeaway Section</summary>
+      <div class="site-editor-body">
+        <label class="field"><span>Small label</span><input type="text" id="site-delivery-eyebrow"></label>
+        <label class="field"><span>Title</span><input type="text" id="site-delivery-title"></label>
+        <label class="field">
+          <span>Section spacing</span>
+          <select id="site-delivery-padding">
+            <option value="compact">Compact</option>
+            <option value="normal">Normal</option>
+            <option value="spacious">Spacious</option>
+          </select>
+        </label>
+        <div></div>
+        <label class="field"><span>Card 1 title</span><input type="text" id="site-delivery-card1-title"></label>
+        <label class="field field-full"><span>Card 1 text</span><textarea id="site-delivery-card1-text"></textarea></label>
+        <label class="field"><span>Card 2 title</span><input type="text" id="site-delivery-card2-title"></label>
+        <label class="field field-full"><span>Card 2 text</span><textarea id="site-delivery-card2-text"></textarea></label>
+        <label class="field"><span>Card 3 title</span><input type="text" id="site-delivery-card3-title"></label>
+        <label class="field field-full"><span>Card 3 text (new line = line break)</span><textarea id="site-delivery-card3-text"></textarea></label>
+      </div>
+    </details>
+
+    <details class="site-editor-group">
+      <summary>Find Us Section</summary>
+      <div class="site-editor-body">
+        <label class="field field-full"><span>Small label</span><input type="text" id="site-findus-eyebrow"></label>
+        <label class="field field-full"><span>Headline</span><input type="text" id="site-findus-headline"></label>
+        <label class="field field-full"><span>Address line</span><input type="text" id="site-findus-line1"></label>
+        <label class="field field-full"><span>Hours line</span><input type="text" id="site-findus-line2"></label>
+        <label class="field field-full"><span>Phone / email line</span><input type="text" id="site-findus-line3"></label>
+        <label class="field field-full"><span>Map photo URL</span><input type="text" id="site-findus-map-image"></label>
+        <label class="field field-full"><span>Google Maps link (opens when the photo is tapped)</span><input type="text" id="site-findus-map-link"></label>
+      </div>
+    </details>
+
+    <details class="site-editor-group">
+      <summary>Footer</summary>
+      <div class="site-editor-body">
+        <label class="field"><span>Brand name</span><input type="text" id="site-footer-brand"></label>
+        <label class="field"><span>Tagline</span><input type="text" id="site-footer-tagline"></label>
+        <label class="field"><span>Address</span><input type="text" id="site-footer-address"></label>
+        <label class="field"><span>Contact line</span><input type="text" id="site-footer-contact"></label>
+        <label class="field field-full"><span>Copyright line</span><input type="text" id="site-footer-copyright"></label>
+      </div>
+    </details>
+
+    <div id="site-save-bar">
+      <button class="btn btn-primary" id="save-site-btn">Save Changes</button>
+      <span id="site-save-status"></span>
+    </div>
   </section>
 
 </div>
@@ -129,6 +358,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-storage-compat.js"></script>
 <script src="firebase-config.js"></script>
-<script src="admin.js?v=3"></script>
+<script src="site-content-defaults.js?v=1"></script>
+<script src="admin.js?v=4"></script>
 </body>
 </html>
