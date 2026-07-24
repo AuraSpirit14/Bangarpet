@@ -337,6 +337,7 @@ function renderCart() {
   deliveryEl.textContent = isDelivery() ? `$${fmt(DELIVERY_FEE)}` : "Free (Takeaway)";
   document.getElementById("cart-total").textContent = `$${fmt(cartTotal())}`;
 
+  updateHeaderCartBadge();
   updateMobileBar();
 }
 
