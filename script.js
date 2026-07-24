@@ -318,11 +318,15 @@ function renderCart() {
     const line = document.createElement("div");
     line.className = "cart-line";
     line.innerHTML = `
-      <div class="cart-line-photo"></div>
+      <div class="cart-line-photo">${item.photoUrl ? `<img src="${item.photoUrl}" alt="${item.name}">` : ""}</div>
       <div class="cart-line-info">
-        <div class="cart-line-name">${qty}x ${item.name}</div>
+        <div class="cart-line-name">${item.name}</div>
         <div class="cart-line-price">$${fmt(item.price * qty)}</div>
-        <button class="cart-line-remove" data-id="${id}">Remove</button>
+      </div>
+      <div class="qty-control cart-line-qty">
+        <button data-action="dec" data-id="${id}">−</button>
+        <span>${qty}</span>
+        <button data-action="inc" data-id="${id}">+</button>
       </div>
     `;
     list.appendChild(line);
@@ -339,22 +343,14 @@ function renderCart() {
 document.getElementById("cart-items").addEventListener("click", (e) => {
   const btn = e.target.closest("button[data-id]");
   if (!btn) return;
-  cart[btn.dataset.id] = 0;
+  const id = btn.dataset.id;
+  const action = btn.dataset.action;
+  const current = cart[id] || 0;
+  cart[id] = action === "inc" ? current + 1 : Math.max(0, current - 1);
   renderCart();
   renderMenu();
   updateHeaderCartBadge();
 });
-
-function updateHeaderCartBadge() {
-  document.getElementById("cart-badge").textContent = cartCount();
-}
-function updateMobileBar() {
-  const bar = document.getElementById("mobile-sticky-bar");
-  const count = cartCount();
-  document.getElementById("mobile-cart-summary").textContent = `${count} item${count === 1 ? "" : "s"} · $${fmt(cartTotal())}`;
-  bar.classList.toggle("visible", count > 0 && window.innerWidth <= 860);
-}
-window.addEventListener("resize", updateMobileBar);
 
 // ================= DRAWER OPEN/CLOSE =================
 const overlay = document.getElementById("drawer-overlay");
