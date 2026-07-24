@@ -237,11 +237,18 @@ function closeDrawers() {
   cartDrawer.classList.remove("open");
   checkoutDrawer.classList.remove("open");
 }
-overlay.addEventListener("click", closeDrawers);
+function closeCheckoutAndReset() {
+  closeDrawers();
+  finishCheckoutSession();
+  document.getElementById("cod-order-btn").classList.remove("hidden");
+  document.getElementById("whatsapp-order-btn").classList.remove("hidden");
+}
+
+overlay.addEventListener("click", closeCheckoutAndReset);
 document.getElementById("open-cart").addEventListener("click", () => openDrawer(cartDrawer));
 document.getElementById("mobile-cart-btn").addEventListener("click", () => openDrawer(cartDrawer));
 document.getElementById("close-cart").addEventListener("click", closeDrawers);
-document.getElementById("close-checkout").addEventListener("click", closeDrawers);
+document.getElementById("close-checkout").addEventListener("click", closeCheckoutAndReset);
 
 document.getElementById("proceed-checkout").addEventListener("click", () => {
   if (cartCount() === 0) return;
@@ -366,14 +373,24 @@ async function saveOrderToFirestore(record) {
   }
 }
 
-function resetCartAndForm() {
+// Clears the cart the moment an order is placed (so it can't be double-submitted)
+// but leaves the checkout drawer open so the customer can actually read the
+// confirmation message and tap the tracking link. Nothing auto-closes.
+function clearCartKeepDrawerOpen() {
   Object.keys(cart).forEach((k) => delete cart[k]);
   renderMenu();
   renderCart();
   updateHeaderCartBadge();
+}
+
+// Called when the customer closes the checkout drawer themselves (✕ button or
+// tapping the overlay) — this is when we actually reset the form for next time.
+function finishCheckoutSession() {
   document.getElementById("checkout-form").reset();
   document.getElementById("cf-city").value = "Rotorua";
-  closeDrawers();
+  document.getElementById("form-error").textContent = "";
+  document.getElementById("form-error").style.color = "";
+  document.getElementById("address-fields").classList.add("hidden");
 }
 
 // ---- Pay on Delivery/Pickup: goes straight to the Admin orders list, no WhatsApp popup ----
@@ -394,7 +411,9 @@ document.getElementById("cod-order-btn").addEventListener("click", async () => {
     document.getElementById("form-error").innerHTML =
       `Order #${record.orderId} placed! Pay ${record.paymentMethod.toLowerCase()} — we'll start preparing it shortly.<br>` +
       `<a href="${statusLink}" target="_blank" style="color:#B33F2E;font-weight:600;text-decoration:underline;">Track your order status →</a>`;
-    setTimeout(() => resetCartAndForm(), 6000);
+    clearCartKeepDrawerOpen();
+    document.getElementById("cod-order-btn").classList.add("hidden");
+    document.getElementById("whatsapp-order-btn").classList.add("hidden");
   } catch (err) {
     console.error("Couldn't save order:", err);
     document.getElementById("form-error").style.color = "";
@@ -431,7 +450,9 @@ document.getElementById("whatsapp-order-btn").addEventListener("click", async ()
   document.getElementById("form-error").innerHTML =
     `Order #${id} sent on WhatsApp!<br>` +
     `<a href="${statusLink}" target="_blank" style="color:#B33F2E;font-weight:600;text-decoration:underline;">Track your order status →</a>`;
-  setTimeout(() => resetCartAndForm(), 6000);
+  clearCartKeepDrawerOpen();
+  document.getElementById("cod-order-btn").classList.add("hidden");
+  document.getElementById("whatsapp-order-btn").classList.add("hidden");
 
   btn.disabled = false;
   btn.textContent = "Order on WhatsApp";
