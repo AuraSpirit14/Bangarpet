@@ -80,28 +80,35 @@ function trackOrder(orderId) {
     currentUnsubscribe = null;
   }
 
+  document.getElementById("lookup-input").value = orderId;
+
   if (typeof DEMO_MODE !== "undefined" && DEMO_MODE) {
     showLookup("Firebase isn't connected yet — order tracking needs firebase-config.js set up first.");
     return;
   }
 
-  currentUnsubscribe = db
-    .collection("orders")
-    .where("orderId", "==", orderId)
-    .limit(1)
-    .onSnapshot(
-      (snap) => {
-        if (snap.empty) {
-          showLookup(`We couldn't find an order with number "${orderId}". Please check and try again.`);
-          return;
+  try {
+    currentUnsubscribe = db
+      .collection("orders")
+      .where("orderId", "==", orderId)
+      .limit(1)
+      .onSnapshot(
+        (snap) => {
+          if (snap.empty) {
+            showLookup(`We couldn't find an order with number "${orderId}". Please check and try again.`);
+            return;
+          }
+          renderOrder(snap.docs[0].data());
+        },
+        (err) => {
+          console.error("Order tracking error:", err);
+          showLookup("Something went wrong looking up your order. Please try again.");
         }
-        renderOrder(snap.docs[0].data());
-      },
-      (err) => {
-        console.error("Order tracking error:", err);
-        showLookup("Something went wrong looking up your order. Please try again.");
-      }
-    );
+      );
+  } catch (err) {
+    console.error("Couldn't start order tracking:", err);
+    showLookup("Something went wrong connecting to order tracking. Please refresh and try again.");
+  }
 }
 
 document.getElementById("lookup-btn").addEventListener("click", () => {
