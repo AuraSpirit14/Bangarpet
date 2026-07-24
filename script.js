@@ -353,6 +353,18 @@ document.getElementById("cart-items").addEventListener("click", (e) => {
   updateHeaderCartBadge();
 });
 
+// ---- header badge + mobile sticky bar (these were missing — restored here) ----
+function updateHeaderCartBadge() {
+  document.getElementById("cart-badge").textContent = cartCount();
+}
+function updateMobileBar() {
+  const bar = document.getElementById("mobile-sticky-bar");
+  const count = cartCount();
+  document.getElementById("mobile-cart-summary").textContent = `${count} item${count === 1 ? "" : "s"} · $${fmt(cartTotal())}`;
+  bar.classList.toggle("visible", count > 0 && window.innerWidth <= 860);
+}
+window.addEventListener("resize", updateMobileBar);
+
 // ================= DRAWER OPEN/CLOSE =================
 const overlay = document.getElementById("drawer-overlay");
 const cartDrawer = document.getElementById("cart-drawer");
